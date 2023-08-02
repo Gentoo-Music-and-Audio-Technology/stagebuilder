@@ -88,7 +88,7 @@ cd
 rm -rf decibellinux.org
 
 # buildpkg and usepkg used here to cut down on build time.
-# Temporarily disable getinpkg so we can turn --usepkg on and off.
+# Temporarily disable getbinpkg so we can turn --usepkg on and off.
 FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" dev-vcs/git # Needed to sync decibel Linux repo.
 emaint sync
 FEATURES="-getbinpkg" emerge --ask=n --quiet --update --deep --newuse --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" @world
@@ -99,7 +99,7 @@ eselect news read all # Old news is not relevant to new users
 #while read p; do
 #	emerge --ask=n --buildpkg --usepkg --buildpkg-exclude "virtual/* sys-kernel/*-sources" $p
 #done <packages
-FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkgexclude "$exclude_list" \
+FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" \
 app-portage/cpuid2cpuflags \
 app-portage/eix \
 app-portage/genlop \
