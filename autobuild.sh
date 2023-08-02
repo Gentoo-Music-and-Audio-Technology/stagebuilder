@@ -1,19 +1,20 @@
 #!/bin/bash
 
-# Download a stage3 seed
-# Unpack it
-# Chroot into it
-# chroot_autobuild.sh runs in chroot
-# Make tarball
-# scp tarball to VM's host
-# If build successful, make a backup of seed tarball
+# Procedure:
+# Send start email
+# Download seed
+# Unpack seed
+# Chroot and continue build inside chroot
+# Handle binkpgs produced by emerge
+# Create tarball & clean up
+# Send completion email
 
 ### Command-line arguments (only one can be used at a time)
 # noseed: Do not download and update the seed. Used when something has changed and throws a wrench into catalyst builds. In this case, cp the last known good seed instead.
 
 ### Note that full paths must be used, including to symlinks, so that the cronjob that calls this script (if used) won't fail.
 
-set -eo # Stop at first error (o catches piped errors)
+set -eo # Stop at first error.
 
 url="https://distfiles.gentoo.org/releases/amd64/autobuilds/"
 txtfile="latest-stage3-amd64-desktop-systemd.txt"
@@ -54,13 +55,22 @@ exit_gracefully(){
 	echo "Exiting autobuild."
 }
 
+die(){
+	echo "$*" 1>&2
+	umount_all
+	cleanup
+	create_mailmsg "Autobuild error" "$*"
+	exit 1
+}
+
 trap 'exit_gracefully $? $LINENO' ERR
 
-# Notify that build is starting
+# Notify that build is starting.
 start_time=$(date)
 create_mailmsg "Build beginning" "The latest build was started at $start_time."
 
 ### DOWNLOAD SEED
+
 # Get text file describing latest stage3 tarball.
 # -O option circumvents wget creating a new file on every run and gives us a fixed filename to use.
 # The wget -S option is --server-response, which can be grepped.
@@ -100,9 +110,9 @@ fi
 
 mkdir -p $builddir/stage4
 echo "Unpacking seed... Please be patient."
-tar xpf $builddir/$seedname --xattrs-include='*.*' --numeric-owner -C $builddir/stage4 # Verbose to troubleshoot
+tar xpf $builddir/$seedname --xattrs-include='*.*' --numeric-owner -C $builddir/stage4 # Verbose to troubleshoot.
 
-### PART 3: CHROOT
+### CHROOT
 
 mount -t proc /proc $builddir/stage4/proc
 mount --rbind /sys $builddir/stage4/sys
@@ -113,8 +123,11 @@ mount --bind /run $builddir/stage4/run
 mount --make-slave $builddir/stage4/run
 
 cp /etc/resolv.conf $builddir/stage4/etc/
-cp chroot_autobuild.sh $builddir/stage4/
+cp chroot_autobuild.sh $builddir/stage4/ || die "Could not cp chroot_autobuild.sh to chroot."
+cp packages $builddir/stage4/ || die "Could not cp the packages file to chroot."
 chroot $builddir/stage4 ./chroot_autobuild.sh
+
+### BINPKGS
 
 # Mv binpkgs out of stage4. Don't forget to scp to web server on VM host.
 # Need to ls recursively to get pkgs added.
@@ -124,12 +137,16 @@ chroot $builddir/stage4 ./chroot_autobuild.sh
 rm -rf $builddir/binpkgs # Clear out binpkgs from previous build
 mv $builddir/stage4/var/cache/binpkgs/ $builddir/
 
+### CREATE TARBALL & CLEANUP
+
 # Pack up stage4 and empty out stage4 dir.
 unmount_all
 cd $builddir/stage4
 echo "Packing up stage4... Please be patient."
 rm $builddir/stage4/chroot_autobuild.sh
+rm $builddir/stage4/packages
 tar -cjf $builddir/decibellinux-stage4.tar.bz2 --exclude='/run/*' --exclude='/dev/*' --exclude='/sys/*' --exclude='/proc/*' .
+# Don't forget to move tarball to live server.
 cleanup
 
 end_time=$(date)

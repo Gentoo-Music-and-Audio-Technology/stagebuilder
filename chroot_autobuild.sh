@@ -3,6 +3,8 @@
 # set -e is !needed here bec it is called by a script outside chroot that uses set -e already.
 
 builddir="/var/tmp/stagebuilder"
+usepkg="n" # Choose between y and n. Useful for troubleshooting and rebuilding the binhost.
+exclude_list="virtual/* sys-kernel/*-sources acct-group/* acct-user/* app-eselect/*"
 
 ### PREP BEFORE PKG INSTALLATION
 
@@ -85,13 +87,19 @@ cp -r * /etc/portage
 cd
 rm -rf decibellinux.org
 
-emerge dev-vcs/git # Needed to sync decibel Linux repo
+# buildpkg and usepkg used here to cut down on build time.
+# Temporarily disable getinpkg so we can turn --usepkg on and off.
+FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" dev-vcs/git # Needed to sync decibel Linux repo.
 emaint sync
-emerge --quiet --update --deep --newuse @world
+FEATURES="-getbinpkg" emerge --ask=n --quiet --update --deep --newuse --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" @world
 eselect news read all # Old news is not relevant to new users
 
 # Install pkgs for decibel Linux, and also build binaries
-emerge --buildpkg --usepkg --buildpkg-exclude "virtual/* sys-kernel/*-sources" \
+# Something is wrong here. Script skips to locales at this point.
+#while read p; do
+#	emerge --ask=n --buildpkg --usepkg --buildpkg-exclude "virtual/* sys-kernel/*-sources" $p
+#done <packages
+FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkgexclude "$exclude_list" \
 app-portage/cpuid2cpuflags \
 app-portage/eix \
 app-portage/genlop \
@@ -167,6 +175,8 @@ net-misc/dhcpcd \
 net-misc/networkmanager \
 sys-apps/usbutils \
 sys-boot/grub \
+sys-boot/plymouth \
+sys-kernel/dracut \
 sys-kernel/genkernel \
 sys-kernel/linux-firmware \
 sys-kernel/rt-sources \
@@ -178,7 +188,7 @@ xfce-extra/xfce4-whiskermenu-plugin \
 xfce-extra/xfce4-alsa-plugin \
 xfce-base/xfce4-power-manager
 
-# Need code to generate list of default installed apps based on above list.
+# Need code here to generate list of default installed apps based the packages file.
 
 # Config kernel
 # Kernel has to be genkernelled now to generate a .config. Make bzImage only to save time.
