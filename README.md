@@ -8,3 +8,5 @@ LICENSE: GNU GPL v.3 (https://www.gnu.org/licenses/gpl-3.0.html#license-text)
 DISCLAIMER: No warranties or guarantees are made. This code is provided as-is. Use at your own risk. decible Linux is built in a virtual machine so as not to adversely impact my own computers if anything goes wrong. 
 
 As a side note, NEVER try to manually rm -rf the stage4 build dir unless dev, sys, proc, and run have been umounted from it. 
+
+This software is not versioned.
