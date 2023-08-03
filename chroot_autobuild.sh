@@ -186,7 +186,7 @@ x11-misc/mugshot \
 xfce-base/xfce4-meta \
 xfce-extra/xfce4-whiskermenu-plugin \
 xfce-extra/xfce4-alsa-plugin \
-xfce-base/xfce4-power-manager
+xfce-base/xfce4-power-manager || die "Packages were not merged. Quitting."
 
 # Need code here to generate list of default installed apps based the packages file.
 
