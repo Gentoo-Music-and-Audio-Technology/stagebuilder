@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Use this script if you need to force autobuild to quit before it's done,
+# or if autobuild exits unexpectedly.
+
 builddir="/var/tmp/stagebuilder" # Do not use trailing slash here.
 echo "Unmounting file systems..."
 umount -l $builddir/stage4/dev{/shm,/pts,}
