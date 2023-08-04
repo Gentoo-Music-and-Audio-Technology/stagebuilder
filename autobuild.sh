@@ -44,6 +44,9 @@ unmount_all(){
 cleanup(){
 	echo "Emptying stage4 directory..."
 	if [ "$(ls -A $builddir/stage4/)" ]; then rm -rf $builddir/stage4/*; fi
+	mv $builddir/binpkgs $builddir/binpkgs_new
+	# Handle contents of binpkgs_new before running autobuild again!
+	rm -rf $builddir/binpkgs/*
 	echo "Cleanup complete."
 }
 
@@ -64,6 +67,13 @@ die(){
 }
 
 trap 'exit_gracefully $? $LINENO' ERR
+
+if (whiptail --title "Binpkg check" --yesno "Binpkgs will be rebuilt. Did you handle the previous run?" 8 78); then
+	echo "Okay, proceeding with autobuild."
+else
+	echo "Thank you. Exiting autobuild."
+	exit 1;
+fi
 
 # Notify that build is starting.
 start_time=$(date)

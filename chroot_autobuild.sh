@@ -224,6 +224,7 @@ wget https://decibellinux.org/src/xfce/xsettings.xml
 wget https://decibellinux.org/src/img/decibelLinux2023.png
 wget https://decibellinux.org/src/theme/Amy-Dark-GTK.tar.gz
 wget https://decibellinux.org/src/theme/Amy-Dark-Icons.tar.gz
+wget -r -np -R "index.html*" https://decibellinux.org/src/plymouth/cybernetic/
 mv xfce4-desktop.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
 mv xfce4-panel.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
 mv xsettings.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
@@ -232,6 +233,7 @@ tar xzf Amy-Dark-GTK.tar.gz
 mv Amy-Dark-GTK /usr/share/themes
 tar xzf Amy-Dark-Icons.tar.gz
 mv Amy-Dark-Icons /usr/share/icons
+mv decibellinux.org/src/plymouth/cybernetic /usr/share/plymouth/themes/
 rm Amy-Dark-GTK.tar.gz
 rm Amy-Dark-Icons.tar.gz
 

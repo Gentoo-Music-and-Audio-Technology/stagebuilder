@@ -54,7 +54,7 @@ GRUB_CMDLINE_LINUX_DEFAULT='quiet splash'
 GRUB_GFXMODE=1366x768x24
 GRUB_GFXPAYLOAD_LINUX=keep
 EOF
-plymouth-set-default-theme solar # Replace with decibel Linux custom theme.
+plymouth-set-default-theme cybernetic # Replace with decibel Linux custom theme.
 dracut --force
 grub-mkconfig -o /boot/grub/grub.cfg
 # sed grub.cfg to replace "Gentoo Linux" with "decibel Linux"
