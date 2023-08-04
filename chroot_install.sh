@@ -74,7 +74,7 @@ mkdir -p /home/$reguser/.config/xfce4/xfconf/xfce-perchannel-xml
 wget --no-check-certificate https://decibellinux.org/src/xfce4-desktop.xml
 mv xfce4-desktop.xml /home/$reguser/.config/xfce4/xfconf/xfce-perchannel-xml
 mkdir -p /home/$reguser/Desktop # Just in case
-wget https://gentoostudio.org/src/Welcome.txt
+wget https://gentoostudio.org/src/xfce/Welcome.txt
 mv Welcome.txt /home/$reguser/Desktop # We only care about THIS user. Other users will not get this file.
 chown -R $reguser:$reguser /home/$reguser
 
