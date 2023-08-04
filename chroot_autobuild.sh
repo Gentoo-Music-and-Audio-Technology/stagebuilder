@@ -238,7 +238,7 @@ rm Amy-Dark-Icons.tar.gz
 # Enable all locales and allow user to narrow it down if they choose to.
 # Change this to allow user to select locale.
 cp /usr/share/i18n/SUPPORTED /etc/locale.gen
-locale-gen
+locale-gen --quiet
 
 # This reduces the tarball size by rm'ing !needed files.
 rm -rf /var/cache/distfiles/*
