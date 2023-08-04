@@ -221,7 +221,7 @@ systemctl enable dhcpcd
 wget https://decibellinux.org/src/xfce4-desktop.xml
 wget https://decibellinux.org/src/xfce4-panel.xml
 wget https://decibellinux.org/src/xsettings.xml
-wget https://decibellinux.org/src/decibelLinux2023.png
+wget https://decibellinux.org/src/img/decibelLinux2023.png
 wget https://decibellinux.org/src/Amy-Dark-GTK.tar.gz
 wget https://decibellinux.org/src/Amy-Dark-Icons.tar.gz
 mv xfce4-desktop.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
