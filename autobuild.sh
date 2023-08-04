@@ -34,16 +34,21 @@ create_mailmsg(){
 
 unmount_all(){
 	echo "Unmounting dev, proc, sys, and run..."
-	umount -l $builddir/stage4/dev{/shm,/pts,}
-	umount -l $builddir/stage4/proc
-	umount -l $builddir/stage4/sys
-	umount -l $builddir/stage4/run
+	if [ "$(ls -A $builddir/stage4/dev)" ]; then
+		umount -l $builddir/stage4/dev{/shm,/pts,}
+	if [ "$(ls -A $builddir/stage4/proc)" ]; then
+		umount -l $builddir/stage4/proc
+	if [ "$(ls -A $builddir/stage4/sys)" ]; then
+		umount -l $builddir/stage4/sys
+	if [ "$(ls -A $builddir/stage4/run)" ]; then
+		umount -l $builddir/stage4/run
 	echo "Done."
 }
 
 cleanup(){
 	echo "Emptying stage4 directory..."
-	rm -rf $builddir/stage4/*
+	if [ "$(ls -A $builddir/stage4/)" ]; then
+		rm -rf $builddir/stage4/*
 	echo "Cleanup complete."
 }
 
@@ -70,10 +75,8 @@ start_time=$(date)
 create_mailmsg "Build beginning" "The latest build was started at $start_time."
 
 # Cleanup before beginning build, just in case.
-# This needs an exception to handle cases where autobuild or user has already unmounted filesystems.
-# If filesystems are already unmounted, the script exits.
-#unmount_all
-#cleanup
+unmount_all
+cleanup
 
 ### DOWNLOAD SEED
 
