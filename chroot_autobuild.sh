@@ -3,7 +3,7 @@
 # set -e is !needed here bec it is called by a script outside chroot that uses set -e already.
 
 builddir="/var/tmp/stagebuilder"
-usepkg="n" # Choose between y and n. Useful for troubleshooting and rebuilding the binhost.
+usepkg="getbinpkg" # Choose between getbinpkg and -getbinpkg. Useful for troubleshooting and rebuilding the binhost.
 exclude_list="virtual/* sys-kernel/*-sources acct-group/* acct-user/* app-eselect/*"
 
 ### PREP BEFORE PKG INSTALLATION
@@ -88,10 +88,9 @@ cd
 rm -rf decibellinux.org
 
 # buildpkg and usepkg used here to cut down on build time.
-# Temporarily disable getbinpkg so we can turn --usepkg on and off.
-FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" dev-vcs/git # Needed to sync decibel Linux repo.
+FEATURES="$usepkg" emerge --ask=n --buildpkg --buildpkg-exclude "$exclude_list" dev-vcs/git # Needed to sync decibel Linux repo.
 emaint sync
-FEATURES="-getbinpkg" emerge --ask=n --quiet --update --deep --newuse --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" @world
+FEATURES="$usepkg" emerge --ask=n --quiet --update --deep --newuse --buildpkg --buildpkg-exclude "$exclude_list" @world
 eselect news read all # Old news is not relevant to new users
 
 # Install pkgs for decibel Linux, and also build binaries
@@ -99,7 +98,7 @@ eselect news read all # Old news is not relevant to new users
 #while read p; do
 #	emerge --ask=n --buildpkg --usepkg --buildpkg-exclude "virtual/* sys-kernel/*-sources" $p
 #done <packages
-FEATURES="-getbinpkg" emerge --ask=n --buildpkg --usepkg=$usepkg --buildpkg-exclude "$exclude_list" \
+FEATURES="$usepkg" emerge --ask=n --buildpkg --buildpkg-exclude "$exclude_list" \
 app-portage/cpuid2cpuflags \
 app-portage/eix \
 app-portage/genlop \

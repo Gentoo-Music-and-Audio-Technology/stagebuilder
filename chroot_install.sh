@@ -44,13 +44,18 @@ $installdevice$rootpart	/	ext4	noatime			0 1
 $installdevice$swappart	none	swap	sw			0 0
 EOF
 
-# Grub
+# Grub & bootsplash
 grub-install --target=x86_64-efi --efi-directory=/boot --removable
 cat > /etc/default/grub <<EOF
 GRUB_DISTRIBUTOR="decibel"
 GRUB_DISABLE_LINUX_PARTUUID=false
 GRUB_DISABLE_OS_PROBER=false
+GRUB_CMDLINE_LINUX_DEFAULT='quiet splash'
+GRUB_GFXMODE=1366x768x24
+GRUB_GFXPAYLOAD_LINUX=keep
 EOF
+plymouth-set-default-theme solar # Replace with decibel Linux custom theme.
+dracut --force
 grub-mkconfig -o /boot/grub/grub.cfg
 # sed grub.cfg to replace "Gentoo Linux" with "decibel Linux"
 
@@ -123,7 +128,7 @@ Installer will now perform a system update. This could take a little time but is
 \n It is highly recommended to update your system regularly, such as weekly or monthly at the latest.
 \n Instructions for updating your system can be found at https://decibellinux.org.
 \n decibel Linux is a rolling release system so waiting too long to update could be tricky." 0 0
-emerge -uDN --keep-going --with-bdeps=y --backtrack=250 @system @world
+FEATURES="getbinpkg" emerge -uDN --keep-going --with-bdeps=y --backtrack=250 @system @world
 
 # Set EMERGE_DEFAULT_OPTS for users
 sed -i 's/EMERGE_DEFAULT_OPTS="--quiet"/EMERGE_DEFAULT_OPTS="--quiet --ask --ask-enter-invalid --autounmask-license=y --autounmask-write=y"/' /etc/portage/make.conf

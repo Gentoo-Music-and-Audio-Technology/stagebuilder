@@ -69,6 +69,12 @@ trap 'exit_gracefully $? $LINENO' ERR
 start_time=$(date)
 create_mailmsg "Build beginning" "The latest build was started at $start_time."
 
+# Cleanup before beginning build, just in case.
+# This needs an exception to handle cases where autobuild or user has already unmounted filesystems.
+# If filesystems are already unmounted, the script exits.
+#unmount_all
+#cleanup
+
 ### DOWNLOAD SEED
 
 # Get text file describing latest stage3 tarball.
