@@ -34,21 +34,16 @@ create_mailmsg(){
 
 unmount_all(){
 	echo "Unmounting dev, proc, sys, and run..."
-	if [ "$(ls -A $builddir/stage4/dev)" ]; then
-		umount -l $builddir/stage4/dev{/shm,/pts,}
-	if [ "$(ls -A $builddir/stage4/proc)" ]; then
-		umount -l $builddir/stage4/proc
-	if [ "$(ls -A $builddir/stage4/sys)" ]; then
-		umount -l $builddir/stage4/sys
-	if [ "$(ls -A $builddir/stage4/run)" ]; then
-		umount -l $builddir/stage4/run
+	if [ "$(ls -A $builddir/stage4/dev)" ]; then umount -l $builddir/stage4/dev{/shm,/pts,}; fi
+	if [ "$(ls -A $builddir/stage4/proc)" ]; then umount -l $builddir/stage4/proc; fi
+	if [ "$(ls -A $builddir/stage4/sys)" ]; then umount -l $builddir/stage4/sys; fi
+	if [ "$(ls -A $builddir/stage4/run)" ]; then umount -l $builddir/stage4/run; fi
 	echo "Done."
 }
 
 cleanup(){
 	echo "Emptying stage4 directory..."
-	if [ "$(ls -A $builddir/stage4/)" ]; then
-		rm -rf $builddir/stage4/*
+	if [ "$(ls -A $builddir/stage4/)" ]; then rm -rf $builddir/stage4/*; fi
 	echo "Cleanup complete."
 }
 
