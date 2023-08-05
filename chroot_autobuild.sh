@@ -250,6 +250,15 @@ echo "Done."
 cp /usr/share/i18n/SUPPORTED /etc/locale.gen
 locale-gen --quiet
 
+cat > /etc/default/grub <<EOF
+GRUB_DISTRIBUTOR="decibel"
+GRUB_DISABLE_LINUX_PARTUUID=false
+GRUB_DISABLE_OS_PROBER=false
+GRUB_CMDLINE_LINUX_DEFAULT='quiet splash'
+GRUB_GFXMODE=1366x768x24
+GRUB_GFXPAYLOAD_LINUX=keep
+EOF
+
 # This reduces the tarball size by rm'ing !needed files.
 rm -rf /var/cache/distfiles/*
 rm -rf /usr/src/linux/*

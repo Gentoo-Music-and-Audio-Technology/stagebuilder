@@ -46,18 +46,9 @@ EOF
 
 # Grub & bootsplash
 grub-install --target=x86_64-efi --efi-directory=/boot --removable
-cat > /etc/default/grub <<EOF
-GRUB_DISTRIBUTOR="decibel"
-GRUB_DISABLE_LINUX_PARTUUID=false
-GRUB_DISABLE_OS_PROBER=false
-GRUB_CMDLINE_LINUX_DEFAULT='quiet splash'
-GRUB_GFXMODE=1366x768x24
-GRUB_GFXPAYLOAD_LINUX=keep
-EOF
-plymouth-set-default-theme cybernetic # Replace with decibel Linux custom theme.
+plymouth-set-default-theme cybernetic
 dracut --force
 grub-mkconfig -o /boot/grub/grub.cfg
-# sed grub.cfg to replace "Gentoo Linux" with "decibel Linux"
 
 # Passwords
 echo "Enter a password for root:"
