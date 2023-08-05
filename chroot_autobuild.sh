@@ -81,11 +81,13 @@ EOF
 
 # package.*
 cd
-wget -r -np -R "index.html*" https://decibellinux.org/src/etc/
+echo "Fetching portage config files (/etc/portage/*)..."
+wget --quiet -r -np -R "index.html*" https://decibellinux.org/src/etc/
 cd decibellinux.org/src/etc/portage
 cp -r * /etc/portage
 cd
 rm -rf decibellinux.org
+echo "Done."
 
 # buildpkg and usepkg used here to cut down on build time.
 FEATURES="$usepkg" emerge --ask=n --buildpkg --buildpkg-exclude "$exclude_list" dev-vcs/git # Needed to sync decibel Linux repo.
@@ -218,13 +220,18 @@ systemctl enable dhcpcd
 
 ### Customize default appearance
 # Current GTK theme/icons is Amy-Dark
-wget https://decibellinux.org/src/xfce/xfce4-desktop.xml
-wget https://decibellinux.org/src/xfce/xfce4-panel.xml
-wget https://decibellinux.org/src/xfce/xsettings.xml
-wget https://decibellinux.org/src/img/decibelLinux2023.png
-wget https://decibellinux.org/src/theme/Amy-Dark-GTK.tar.gz
-wget https://decibellinux.org/src/theme/Amy-Dark-Icons.tar.gz
-wget -r -np -R "index.html*" https://decibellinux.org/src/plymouth/cybernetic/
+echo "Fetching Xfce4 config files..."
+wget --quiet https://decibellinux.org/src/xfce/xfce4-desktop.xml
+wget --quiet https://decibellinux.org/src/xfce/xfce4-panel.xml
+wget --quiet https://decibellinux.org/src/xfce/xsettings.xml
+wget --quiet https://decibellinux.org/src/img/decibelLinux2023.png
+wget --quiet https://decibellinux.org/src/theme/Amy-Dark-GTK.tar.gz
+wget --quiet https://decibellinux.org/src/theme/Amy-Dark-Icons.tar.gz
+echo "Done."
+echo "Fetching bootsplash files..."
+wget --quiet -r -np -R "index.html*" https://decibellinux.org/src/plymouth/cybernetic/
+echo "Done."
+echo "Moving config files..."
 mv xfce4-desktop.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
 mv xfce4-panel.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
 mv xsettings.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
@@ -236,6 +243,7 @@ mv Amy-Dark-Icons /usr/share/icons
 mv decibellinux.org/src/plymouth/cybernetic /usr/share/plymouth/themes/
 rm Amy-Dark-GTK.tar.gz
 rm Amy-Dark-Icons.tar.gz
+echo "Done."
 
 # Enable all locales and allow user to narrow it down if they choose to.
 # Change this to allow user to select locale.
