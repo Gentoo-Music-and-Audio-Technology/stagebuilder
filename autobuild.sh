@@ -46,7 +46,7 @@ cleanup(){
 	if [ "$(ls -A $builddir/stage4/)" ]; then rm -rf $builddir/stage4/*; fi
 	mv $builddir/binpkgs $builddir/binpkgs_new
 	# Handle contents of binpkgs_new before running autobuild again!
-	rm -rf $builddir/binpkgs/*
+	if [ "$(ls -A $builddir/binpkgs/)" ]; then rm -rf $builddir/binpkgs/*; fi
 	echo "Cleanup complete."
 }
 
