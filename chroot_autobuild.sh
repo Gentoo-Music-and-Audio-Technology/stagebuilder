@@ -4,7 +4,7 @@
 
 builddir="/var/tmp/stagebuilder"
 usepkg="getbinpkg" # Choose between getbinpkg and -getbinpkg. Useful for troubleshooting and rebuilding the binhost.
-exclude_list="virtual/* sys-kernel/*-sources acct-group/* acct-user/* app-eselect/*"
+exclude_list="virtual/* sys-kernel/*-sources acct-group/* acct-user/* app-eselect/* sys-kernel/*-firmware"
 
 ### PREP BEFORE PKG INSTALLATION
 
