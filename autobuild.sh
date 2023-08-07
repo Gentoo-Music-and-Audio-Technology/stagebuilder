@@ -42,12 +42,13 @@ unmount_all(){
 }
 
 cleanup(){
-	echo "Emptying stage4 directory..."
-	if [ "$(ls -A $builddir/stage4/)" ]; then rm -rf $builddir/stage4/*; fi
-	mv $builddir/binpkgs $builddir/binpkgs_new
-	# Handle contents of binpkgs_new before running autobuild again!
-	if [ "$(ls -A $builddir/binpkgs/)" ]; then rm -rf $builddir/binpkgs/*; fi
-	echo "Cleanup complete."
+        echo "Emptying stage4 directory..."
+        if [ "$(ls -A $builddir/stage4/)" ]; then rm -rf $builddir/stage4/*; fi
+        if [ "$(ls -A $builddir/binpkgs/)" ]; then
+                mv $builddir/binpkgs $builddir/binpkgs_new   
+                rm -rf $builddir/binpkgs/*
+        fi
+        echo "Cleanup complete."
 }
 
 exit_gracefully(){
