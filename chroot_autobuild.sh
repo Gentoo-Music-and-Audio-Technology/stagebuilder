@@ -90,104 +90,18 @@ rm -rf decibellinux.org
 echo "Done."
 
 # buildpkg and usepkg used here to cut down on build time.
+# If this script was written in python, it might be easier to try to catch "invalid GPG" errors and have portage switch to -getbinpkg for that package.
 FEATURES="$usepkg" emerge --ask=n --buildpkg --buildpkg-exclude "$exclude_list" dev-vcs/git # Needed to sync decibel Linux repo.
 emaint sync
 FEATURES="$usepkg" emerge --ask=n --quiet --update --deep --newuse --buildpkg --buildpkg-exclude "$exclude_list" @world
 eselect news read all # Old news is not relevant to new users
 
 # Install pkgs for decibel Linux, and also build binaries
-# Something is wrong here. Script skips to locales at this point.
-#while read p; do
-#	emerge --ask=n --buildpkg --usepkg --buildpkg-exclude "virtual/* sys-kernel/*-sources" $p
-#done <packages
-FEATURES="$usepkg" emerge --ask=n --buildpkg --buildpkg-exclude "$exclude_list" \
-app-portage/cpuid2cpuflags \
-app-portage/eix \
-app-portage/genlop \
-app-portage/gentoolkit \
-app-portage/smart-live-rebuild \
-app-portage/ufed \
-dev-util/geany \
-gnome-extra/nm-applet \
-media-plugins/adlplug \
-media-plugins/airwindows \
-media-plugins/alsa-plugins \
-media-plugins/argotlunar \
-media-plugins/artyfx \
-media-plugins/calf \
-media-plugins/cardinal \
-media-plugins/distrho-ports \
-media-plugins/dragonfly-reverb \
-media-plugins/drumgizmo \
-media-plugins/fabla \
-media-plugins/lsp-plugins-lv2 \
-media-plugins/odin \
-media-plugins/opnplug \
-media-plugins/sorcer \
-media-plugins/x42-avldrums \
-media-plugins/x42-plugins \
-media-plugins/zam-plugins \
-media-sound/a2jmidid \
-media-sound/aeolus \
-media-sound/aliki \
-media-sound/alsa-tools \
-media-sound/alsa-utils \
-media-sound/amsynth \
-media-sound/ardour \
-media-sound/arpage \
-media-sound/audacious \
-media-sound/audacity \
-media-sound/bitmeter \
-media-sound/bristol \
-media-sound/butt \
-media-sound/cadence \
-media-sound/carla \
-media-sound/chuck \
-media-sound/din \
-media-sound/fluidsynth \
-media-sound/galan \
-media-sound/ghostess \
-media-sound/gmidimonitor \
-media-sound/hydrogen \
-media-sound/hydrogen-drumkits \
-media-sound/jack-rack \
-media-sound/jack2 \
-media-sound/jackmidiclock \
-media-sound/jamin \
-media-sound/japa \
-media-sound/linuxsampler \
-media-sound/lmms \
-media-sound/luppp \
-media-sound/mixxx \
-media-sound/new-session-manager \
-media-sound/patchage \
-media-sound/pure-data \
-media-sound/qjackctl \
-media-sound/qmidiarp \
-media-sound/qsampler \
-media-sound/qtractor \
-media-sound/rosegarden \
-media-sound/terminatorx \
-media-sound/timemachine \
-media-sound/tk707 \
-media-sound/vmpk \
-media-sound/yoshimi \
-net-misc/dhcpcd \
-net-misc/networkmanager \
-sys-apps/usbutils \
-sys-boot/grub \
-sys-boot/plymouth \
-sys-kernel/dracut \
-sys-kernel/genkernel \
-sys-kernel/linux-firmware \
-sys-kernel/rt-sources \
-x11-base/xorg-server \
-x11-misc/lightdm \
-x11-misc/mugshot \
-xfce-base/xfce4-meta \
-xfce-extra/xfce4-whiskermenu-plugin \
-xfce-extra/xfce4-alsa-plugin \
-xfce-base/xfce4-power-manager || die "Packages were not merged. Quitting."
+# std-pkg.list = JACK/ALSA-based decibel Linux
+# Planned: pw-pkg.list: Pipewire-based decibel Linux
+# Full in-chroot file path is needed
+pkglist=$(</std-pkg.list) || die "pkglist file not found."
+FEATURES="$usepkg" emerge --ask=n --buildpkg --buildpkg-exclude "$exclude_list" $pkglist || die "Packages were not merged. Quitting."
 
 # Need code here to generate list of default installed apps based the packages file.
 

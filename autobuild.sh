@@ -45,8 +45,9 @@ cleanup(){
         echo "Emptying stage4 directory..."
         if [ "$(ls -A $builddir/stage4/)" ]; then rm -rf $builddir/stage4/*; fi
         if [ "$(ls -A $builddir/binpkgs/)" ]; then
-                mv $builddir/binpkgs $builddir/binpkgs_new   
-                rm -rf $builddir/binpkgs/*
+		# The rm -rf is why we have a whiptail dialog confirmation.
+		rm -rf $builddir/binpkgs_new/
+                mv $builddir/binpkgs $builddir/binpkgs_new
         fi
         echo "Cleanup complete."
 }
@@ -67,6 +68,7 @@ die(){
 	exit 1
 }
 
+# This doesn't work the way we want it to, so perhaps python is what we need to use for better err handling.
 trap 'exit_gracefully $? $LINENO' ERR
 
 if (whiptail --title "Binpkg check" --yesno "Binpkgs will be rebuilt. Did you handle the previous run?" 8 78); then
@@ -81,8 +83,8 @@ start_time=$(date)
 create_mailmsg "Build beginning" "The latest build was started at $start_time."
 
 # Cleanup before beginning build, just in case.
-unmount_all
-cleanup
+unmount_all || die "Unmount_all failed."
+cleanup || die "Could not clean up before starting build."
 
 ### DOWNLOAD SEED
 
@@ -139,7 +141,7 @@ mount --make-slave $builddir/stage4/run
 
 cp /etc/resolv.conf $builddir/stage4/etc/
 cp chroot_autobuild.sh $builddir/stage4/ || die "Could not cp chroot_autobuild.sh to chroot."
-cp packages $builddir/stage4/ || die "Could not cp the packages file to chroot."
+cp std-pkg.list $builddir/stage4/ || die "Could not cp the packages file to chroot."
 chroot $builddir/stage4 ./chroot_autobuild.sh
 
 ### BINPKGS
@@ -159,10 +161,10 @@ unmount_all
 cd $builddir/stage4
 echo "Packing up stage4... Please be patient."
 rm $builddir/stage4/chroot_autobuild.sh
-rm $builddir/stage4/packages
+rm $builddir/stage4/std-pkg.list
 tar -cjf $builddir/decibellinux-stage4.tar.bz2 --exclude='/run/*' --exclude='/dev/*' --exclude='/sys/*' --exclude='/proc/*' .
 # Don't forget to move tarball to live server.
-cleanup
+cleanup || die "Could not clean up after completing build."
 
 end_time=$(date)
 create_mailmsg "decibel Linux build complete" "The latest build was completed at $end_time."
