@@ -14,6 +14,7 @@
 
 ### Note that full paths must be used, including to symlinks, so that the cronjob that calls this script (if used) won't fail.
 
+# This does not work, script does not stop the first time something goes wrong.
 set -eo # Stop at first error.
 
 url="https://distfiles.gentoo.org/releases/amd64/autobuilds/"
