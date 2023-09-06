@@ -1,2 +1,0 @@
-Subject: This is a test.
-This is the body of the test message.
