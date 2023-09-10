@@ -21,48 +21,49 @@ from email.message import EmailMessage
 from pathlib import Path
 
 # Variables and data prep
-url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/"	# URL where builds are kept.
-txtfile = "latest-stage3-amd64-desktop-systemd.txt"	# File from which to parse the filename of the latest build.
-builddir = "/var/tmp/stagebuilder" # Do not use trailing slash here.
-stage4dir = Path(f"{builddir}/stage4")
-print("Stage4 dir already exists.") if stage4dir.is_dir() else os.mkdir(f"{builddir}/stage4") # Make sure this dir exists.
-seedname = "stage3seed.tar.xz"	# Filename to store the seed as.
 stagebuilder = {}	# Object for storing values from /etc/conf.d/stagebuilder.
 with open("/etc/conf.d/stagebuilder") as f:
 	for line in f.readlines():
 		key, value = line.rstrip("\n").split("=")
 		stagebuilder[key] = value
+url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/"	# URL where Gentoo stage3 builds are kept.
+txtfile = "latest-stage3-amd64-desktop-systemd.txt"	# File from which to parse the filename of the latest build.
+stage4dir = Path(f"{stagebuilder["builddir"]}/stage4")
+print("Stage4 dir already exists.") if stage4dir.is_dir() else os.mkdir(f"{stagebuilder["builddir"]}/stage4") # Make sure this dir exists.
+seedname = "stage3seed.tar.xz"	# Filename to store the seed as.
 
 def show_progress(block_num, block_size, total_size):
 	percent_done = round(block_num * block_size / total_size *100,2)
 	print(f"{percent_done}%", end="\r")
 
 def create_mail(subj, msg_body):
-	try: 
-		print("Sending mail for: %s" % (subj))
-		msg = EmailMessage()
-		msg.set_content(msg_body)
-		msg['Subject'] = subj
-		msg['From'] = stagebuilder["smtp_from"]
-		msg['To'] = stagebuilder["smtp_to"]
-		smtp = smtplib.SMTP(stagebuilder["smtp_host"], stagebuilder["smtp_port"])
-		smtp.starttls() 
-		smtp.login(stagebuilder["smtp_login"],stagebuilder["smtp_pass"])
-		smtp.send_message(msg)
-		smtp.quit() 
-		print ("Mail sent successfully.") 
-	except Exception as ex: 
-		print("Unable to send mail: ", ex)
-		print("Exiting autobuild. Goodbye.")
-		sys.exit(0)
+	# Change mail_notify in /etc/conf.d/stagebuilder to turn mail notifications on/off.
+	if stagebuilder["mail_notify"]:
+		try: 
+			print("Sending mail for: %s" % subj)
+			msg = EmailMessage()
+			msg.set_content(msg_body)
+			msg['Subject'] = subj
+			msg['From'] = stagebuilder["smtp_from"]
+			msg['To'] = stagebuilder["smtp_to"]
+			smtp = smtplib.SMTP(stagebuilder["smtp_host"], stagebuilder["smtp_port"])
+			smtp.starttls() 
+			smtp.login(stagebuilder["smtp_login"],stagebuilder["smtp_pass"])
+			smtp.send_message(msg)
+			smtp.quit() 
+			print ("Mail sent successfully.") 
+		except Exception as ex: 
+			print("Unable to send mail: ", ex)
+			print("Exiting autobuild. Goodbye.")
+			sys.exit(0)
 
 def unmount_all():
 	try:
 		print("Unmounting dev, proc, sys, and run...")
-		subprocess.run(["umount", "-l", f"{builddir}/stage4/dev{{/shm,/pts,}}"])
-		subprocess.run(["umount", "-l", f"{builddir}/stage4/proc"])
-		subprocess.run(["umount", "-l", f"{builddir}/stage4/sys"])
-		subprocess.run(["umount", "-l", f"{builddir}/stage4/run"])
+		subprocess.run(["umount", "-l", f"{stagebuilder["builddir"]}/stage4/dev{{/shm,/pts,}}"])
+		subprocess.run(["umount", "-l", f"{stagebuilder["builddir"]}/stage4/proc"])
+		subprocess.run(["umount", "-l", f"{stagebuilder["builddir"]}/stage4/sys"])
+		subprocess.run(["umount", "-l", f"{stagebuilder["builddir"]}/stage4/run"])
 		# Assuming that a "No such file" means the dir isn't mounted, which is what we want.
 		print("Done.")
 	except Exception as ex:
@@ -74,8 +75,8 @@ def unmount_all():
 def empty_builddir():
 	try:
 		print("Emptying stage4 build dir...")
-		shutil.rmtree(f"{builddir}/stage4") # Rm it
-		os.mkdir(f"{builddir}/stage4") # Restore empty dir
+		shutil.rmtree(f"{stagebuilder["builddir"]}/stage4") # Rm it
+		os.mkdir(f"{stagebuilder["builddir"]}/stage4") # Restore empty dir
 		print("Done.")
 	except Exception as ex:
 		print("Unable to empty out stage4 build dir because: ", ex)
@@ -133,7 +134,7 @@ try:
 	# Move seed to build dir:
 	print("Moving seed file to build dir...")
 	mvseed = subprocess.run(
-		["mv", f"{seedname}", f"{builddir}/"],
+		["mv", f"{seedname}", f"{stagebuilder["builddir"]}/"],
 		capture_output = True,
 		text = True
 	)
@@ -162,7 +163,7 @@ try:
 	# Would be nice if this could be done in a Pythonish way.
 	# Also would be nice to have a progress indicator a la show_progress as defined earlier.
 	print("Unpacking seed, please wait...")
-	subprocess.run(["tar", "xpf", f"{builddir}/{seedname}", "--xattrs-include='*.*'", "--numeric-owner", "-C", f"{builddir}/stage4"])
+	subprocess.run(["tar", "xpf", f"{stagebuilder["builddir"]}/{seedname}", "--xattrs-include='*.*'", "--numeric-owner", "-C", f"{stagebuilder["builddir"]}/stage4"])
 	print("Done.")
 except Exception as ex:
 	print("Could not unpack seed: ", ex)
@@ -173,13 +174,13 @@ except Exception as ex:
 # Setting up and entering chroot
 try:
 	print("Mounting filesystems...")
-	subprocess.run(["mount", "-t", "proc", "/proc", f"{builddir}/stage4/proc"])
-	subprocess.run(["mount", "--rbind", "/sys", f"{builddir}/stage4/sys"])
-	subprocess.run(["mount", "--rbind", "/dev", f"{builddir}/stage4/dev"])
-	subprocess.run(["mount", "--make-rslave", f"{builddir}/stage4/sys"])
-	subprocess.run(["mount", "--make-rslave", f"{builddir}/stage4/dev"])
-	subprocess.run(["mount", "--bind", "/run", f"{builddir}/stage4/run"])
-	subprocess.run(["mount", "--make-slave", f"{builddir}/stage4/run"])
+	subprocess.run(["mount", "-t", "proc", "/proc", f"{stagebuilder["builddir"]}/stage4/proc"])
+	subprocess.run(["mount", "--rbind", "/sys", f"{stagebuilder["builddir"]}/stage4/sys"])
+	subprocess.run(["mount", "--rbind", "/dev", f"{stagebuilder["builddir"]}/stage4/dev"])
+	subprocess.run(["mount", "--make-rslave", f"{stagebuilder["builddir"]}/stage4/sys"])
+	subprocess.run(["mount", "--make-rslave", f"{stagebuilder["builddir"]}/stage4/dev"])
+	subprocess.run(["mount", "--bind", "/run", f"{stagebuilder["builddir"]}/stage4/run"])
+	subprocess.run(["mount", "--make-slave", f"{stagebuilder["builddir"]}/stage4/run"])
 	print("Done.")
 except Exception as ex:
 	print("Could not mount filesystems: ", ex)
@@ -187,7 +188,7 @@ except Exception as ex:
 	print("Exiting autobuild. Goodbye.")
 	sys.exit(0)
 	
-subprocess.run(["cp", "/etc/resolv.conf", f"{builddir}/stage4/etc/"])
+subprocess.run(["cp", "/etc/resolv.conf", f"{stagebuilder["builddir"]}/stage4/etc/"])
 #cp chroot_autobuild.sh $builddir/stage4/ || die "Could not cp chroot_autobuild.sh to chroot."
 #cp std-pkg.list $builddir/stage4/ || die "Could not cp the packages file to chroot."
 #chroot $builddir/stage4 ./chroot_autobuild.sh
