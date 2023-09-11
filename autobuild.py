@@ -27,7 +27,7 @@ with open("/etc/conf.d/stagebuilder") as f:
 		key, value = line.rstrip("\n").split("=")
 		stagebuilder[key] = value
 url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/"	# URL where Gentoo stage3 builds are kept.
-txtfile = "latest-stage3-amd64-desktop-systemd.txt"	# File from which to parse the filename of the latest build.
+txtfile = f"latest-stage3-{stagebuilder["release_type"]}.txt"	# File from which to parse the filename of the latest build.
 stage4dir = Path(f"{stagebuilder["builddir"]}/stage4")
 print("Stage4 dir already exists.") if stage4dir.is_dir() else os.mkdir(f"{stagebuilder["builddir"]}/stage4") # Make sure this dir exists.
 seedname = "stage3seed.tar.xz"	# Filename to store the seed as.
