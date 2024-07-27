@@ -1,0 +1,63 @@
+# Make sure all packages requiring it are listed in package.accept_keywords.
+# This could be quite a few files and it could take many failed builds to just "see what happens."
+# Read the ebuild for KEYWORDS or emerge -pv on a system that doesn't have it to make this determination.
+# Only three types of lines are allowed in this file: comments, blank lines and the correct category-subcategory/packagename for Portage.
+# Anything else will result in a failure.
+# Comment lines must start with a hash.
+
+# System utils
+
+app-portage/cpuid2cpuflags
+app-portage/eix
+app-portage/gentoolkit
+app-portage/smart-live-rebuild
+app-portage/ufed
+
+# Desktop
+
+x11-misc/lightdm
+xfce-base/xfce4-meta
+gnome-extra/nm-applet
+
+# Plugins/tools
+
+media-plugins/alsa-plugins
+media-plugins/alsaequal
+media-sound/alsa-scarlett-gui
+media-sound/alsa-tools
+media-sound/alsa-utils
+media-sound/alsaplayer
+media-plugins/audacious-plugins
+media-sound/jack2
+media-sound/jack-example-tools
+media-sound/jack-keyboard
+media-sound/jack-smf-utils
+media-sound/jack_capture
+media-sound/jackmidiclock
+
+# Audio/MIDI software
+
+media-sound/ardour
+media-sound/audacious
+media-sound/audacity
+media-sound/hydrogen
+media-sound/hydrogen-drumkits
+media-sound/jack-rack
+media-sound/jamin
+media-sound/lmms
+media-sound/pure-data
+media-sound/qtractor
+media-sound/rosegarden
+
+# Session management
+media-sound/cadence
+media-sound/patchage
+media-sound/qjackctl
+
+# Software instruments
+media-sound/amsynth
+media-sound/yoshimi
+
+# Do not install:
+# sys-firmware/alsa-firmware - Conflicts with linux-firmware.
+# media-sound/jack_mixer - compile fails.

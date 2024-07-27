@@ -1,9 +1,0 @@
-builddir=/var/tmp/stagebuilder
-mail_notify=False
-smtp_host=smtp.mailhost.tld
-smtp_port=123
-smtp_login=user@domain.tld
-smtp_pass=somepass
-smtp_from=user@domain.tld
-smtp_to=user@domain.tld
-release_type=amd64-desktop-systemd
